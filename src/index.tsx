@@ -1,0 +1,362 @@
+import { Hono } from 'hono'
+import { serveStatic } from 'hono/cloudflare-workers'
+
+const app = new Hono()
+
+// Serve static files
+app.use('/static/*', serveStatic({ root: './public' }))
+
+// Main game page
+app.get('/', (c) => {
+  return c.html(`
+    <!DOCTYPE html>
+    <html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>A Trilha do DNA - Jogo de Biotecnologia</title>
+        <link rel="stylesheet" href="/static/styles.css">
+    </head>
+    <body>
+        <!-- DNA Background Animation -->
+        <div class="dna-background">
+            <div class="dna-helix helix-1">
+                <div class="dna-strand strand-left">
+                    <div class="base-pair"></div>
+                    <div class="base-pair"></div>
+                    <div class="base-pair"></div>
+                    <div class="base-pair"></div>
+                    <div class="base-pair"></div>
+                    <div class="base-pair"></div>
+                    <div class="base-pair"></div>
+                    <div class="base-pair"></div>
+                    <div class="base-pair"></div>
+                    <div class="base-pair"></div>
+                </div>
+                <div class="dna-strand strand-right">
+                    <div class="base-pair"></div>
+                    <div class="base-pair"></div>
+                    <div class="base-pair"></div>
+                    <div class="base-pair"></div>
+                    <div class="base-pair"></div>
+                    <div class="base-pair"></div>
+                    <div class="base-pair"></div>
+                    <div class="base-pair"></div>
+                    <div class="base-pair"></div>
+                    <div class="base-pair"></div>
+                </div>
+            </div>
+            <div class="dna-helix helix-2">
+                <div class="dna-strand strand-left">
+                    <div class="base-pair"></div>
+                    <div class="base-pair"></div>
+                    <div class="base-pair"></div>
+                    <div class="base-pair"></div>
+                    <div class="base-pair"></div>
+                    <div class="base-pair"></div>
+                    <div class="base-pair"></div>
+                    <div class="base-pair"></div>
+                    <div class="base-pair"></div>
+                    <div class="base-pair"></div>
+                </div>
+                <div class="dna-strand strand-right">
+                    <div class="base-pair"></div>
+                    <div class="base-pair"></div>
+                    <div class="base-pair"></div>
+                    <div class="base-pair"></div>
+                    <div class="base-pair"></div>
+                    <div class="base-pair"></div>
+                    <div class="base-pair"></div>
+                    <div class="base-pair"></div>
+                    <div class="base-pair"></div>
+                    <div class="base-pair"></div>
+                </div>
+            </div>
+            <div class="dna-helix helix-3">
+                <div class="dna-strand strand-left">
+                    <div class="base-pair"></div>
+                    <div class="base-pair"></div>
+                    <div class="base-pair"></div>
+                    <div class="base-pair"></div>
+                    <div class="base-pair"></div>
+                    <div class="base-pair"></div>
+                    <div class="base-pair"></div>
+                    <div class="base-pair"></div>
+                    <div class="base-pair"></div>
+                    <div class="base-pair"></div>
+                </div>
+                <div class="dna-strand strand-right">
+                    <div class="base-pair"></div>
+                    <div class="base-pair"></div>
+                    <div class="base-pair"></div>
+                    <div class="base-pair"></div>
+                    <div class="base-pair"></div>
+                    <div class="base-pair"></div>
+                    <div class="base-pair"></div>
+                    <div class="base-pair"></div>
+                    <div class="base-pair"></div>
+                    <div class="base-pair"></div>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <!-- Header -->
+            <header class="game-header">
+                <h1 class="game-title">🧬 A Trilha do DNA</h1>
+                <p class="game-subtitle">Da Fermentação à Engenharia Genética</p>
+            </header>
+
+            <!-- Setup Screen -->
+            <div id="setupScreen">
+                <h2>⚙️ Configuração do Jogo</h2>
+                
+                <div class="setup-info">
+                    <p><strong>📚 Sobre o Jogo:</strong></p>
+                    <p>Este jogo educacional simula o processo da biotecnologia moderna. Para vencer, você deve completar 4 missões de inovação (Saúde, Forense, Agricultura e Bioética) e retornar ao início.</p>
+                    <br>
+                    <p><strong>👥 Jogadores:</strong> 2 a 5 cientistas</p>
+                    <p><strong>⏱️ Duração:</strong> 30-60 minutos</p>
+                </div>
+
+                <div id="playersContainer">
+                    <div class="player-input-group">
+                        <input type="text" class="player-name-input" placeholder="Nome do Jogador 1" required>
+                    </div>
+                    <div class="player-input-group">
+                        <input type="text" class="player-name-input" placeholder="Nome do Jogador 2" required>
+                    </div>
+                </div>
+
+                <div class="setup-buttons">
+                    <button id="addPlayerBtn" class="btn-secondary">➕ Adicionar Jogador</button>
+                    <button id="startGameBtn" class="btn-primary">🎮 Iniciar Jogo</button>
+                </div>
+            </div>
+
+            <!-- Game Screen -->
+            <div id="gameScreen" class="hidden">
+                <!-- Dashboard (Sidebar) -->
+                <aside class="dashboard">
+                    <!-- Current Player -->
+                    <div class="dashboard-card">
+                        <h3>🎲 Jogador Atual</h3>
+                        <div class="current-player-info">
+                            <div id="currentPlayerColor" class="player-color-indicator"></div>
+                            <div class="player-info-text">
+                                <h4 id="currentPlayerName">-</h4>
+                                <p id="currentPosition">-</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Missions -->
+                    <div class="dashboard-card">
+                        <h3>🎯 Missões</h3>
+                        <div id="missionsList"></div>
+                    </div>
+
+                    <!-- Resources -->
+                    <div class="dashboard-card">
+                        <h3>🧬 Recursos</h3>
+                        <div id="resourcesList"></div>
+                    </div>
+
+                    <!-- Deck Info -->
+                    <div class="dashboard-card">
+                        <h3>📊 Baralhos</h3>
+                        <div class="deck-info">
+                            <div class="deck-item">
+                                <span>❓ Conceito</span>
+                                <span class="deck-count" id="conceptDeckCount">0</span>
+                            </div>
+                            <div class="deck-item">
+                                <span>❗ Desafio</span>
+                                <span class="deck-count" id="challengeDeckCount">0</span>
+                            </div>
+                            <div class="deck-item">
+                                <span>🎁 Recurso</span>
+                                <span class="deck-count" id="resourceDeckCount">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+
+                <!-- Main Game Area -->
+                <main class="game-main">
+                    <!-- Game Board -->
+                    <div class="board-card">
+                        <h3>🗺️ Tabuleiro do Jogo</h3>
+                        <div id="gameBoard"></div>
+                    </div>
+
+                    <!-- Players List -->
+                    <div class="board-card">
+                        <h3>👥 Jogadores</h3>
+                        <div id="playersList" class="players-list"></div>
+                    </div>
+
+                    <!-- Game Log -->
+                    <div class="board-card">
+                        <h3>📝 Histórico do Jogo</h3>
+                        <div id="gameLog" class="game-log"></div>
+                    </div>
+
+                    <!-- Game Controls -->
+                    <div class="game-controls">
+                        <button id="rollDiceBtn" class="control-btn">🎲 Rolar Dados</button>
+                        <button id="endTurnBtn" class="control-btn">⏭️ Finalizar Turno</button>
+                    </div>
+                </main>
+            </div>
+
+            <!-- Game Over Screen -->
+            <div id="gameOverScreen" class="hidden">
+                <div class="game-over-content">
+                    <div class="trophy">🏆</div>
+                    <h1>PARABÉNS!</h1>
+                    <div class="winner-info">
+                        <h2>Cientista Vencedor:</h2>
+                        <div class="winner-badge">
+                            <div id="winnerColor" class="winner-color"></div>
+                            <div id="winnerName" class="winner-name">-</div>
+                        </div>
+                        <p style="margin-top: 30px; color: #7f8c8d;">
+                            Você completou todas as 4 missões de biotecnologia<br>
+                            e conquistou o Prêmio Nobel! 🎉
+                        </p>
+                    </div>
+                    <button id="newGameBtn" class="modal-btn">🔄 Novo Jogo</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dice Roll Modal -->
+        <div id="diceModal" class="modal hidden">
+            <div class="modal-content dice-modal-content">
+                <div class="modal-header">
+                    <div class="modal-icon">🎲</div>
+                    <h2 class="modal-title">Rolando os Dados</h2>
+                </div>
+                <div class="dice-display">
+                    <div class="dice-3d-wrapper">
+                        <div class="dice-3d" id="dice1Value">
+                            <div class="dice-face dice-front" data-value="1"></div>
+                            <div class="dice-face dice-back" data-value="6"></div>
+                            <div class="dice-face dice-right" data-value="3"></div>
+                            <div class="dice-face dice-left" data-value="4"></div>
+                            <div class="dice-face dice-top" data-value="5"></div>
+                            <div class="dice-face dice-bottom" data-value="2"></div>
+                        </div>
+                    </div>
+                    <div class="dice-3d-wrapper">
+                        <div class="dice-3d" id="dice2Value">
+                            <div class="dice-face dice-front" data-value="1"></div>
+                            <div class="dice-face dice-back" data-value="6"></div>
+                            <div class="dice-face dice-right" data-value="3"></div>
+                            <div class="dice-face dice-left" data-value="4"></div>
+                            <div class="dice-face dice-top" data-value="5"></div>
+                            <div class="dice-face dice-bottom" data-value="2"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="dice-total">
+                    <span class="total-label">Total:</span>
+                    <span class="total-value" id="diceTotal">12</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Question Modal -->
+        <div id="questionModal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-icon">❓</div>
+                    <h2 class="modal-title">Carta de Conceito</h2>
+                    <span id="questionCategory" class="question-category">Categoria</span>
+                </div>
+                <div class="question-text" id="questionText"></div>
+                <div id="questionOptions" class="question-options"></div>
+            </div>
+        </div>
+
+        <!-- Challenge Modal -->
+        <div id="challengeModal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-icon" id="challengeIcon">❗</div>
+                    <h2 class="modal-title" id="challengeTitle">Carta de Desafio</h2>
+                </div>
+                <p class="modal-description" id="challengeDescription"></p>
+                <div class="challenge-action" id="challengeAction"></div>
+                <button id="challengeOkBtn" class="modal-btn">OK, Entendido</button>
+            </div>
+        </div>
+
+        <!-- Mission Modal -->
+        <div id="missionModal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-icon" id="missionIcon">🎯</div>
+                    <h2 class="modal-title" id="missionName">Missão</h2>
+                </div>
+                <p class="modal-description">Escolha como deseja completar esta missão:</p>
+                <div id="missionOptions"></div>
+                <button id="missionCancelBtn" class="modal-btn" style="background: #95a5a6;">Cancelar</button>
+            </div>
+        </div>
+
+        <!-- Zone Choice Modal -->
+        <div id="zoneModal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-icon">🎓</div>
+                    <h2 class="modal-title">Universidade - Hub Central</h2>
+                </div>
+                <p class="modal-description">Escolha uma zona de pesquisa para explorar:</p>
+                <div id="zoneChoices" class="zone-choices"></div>
+            </div>
+        </div>
+
+        <!-- Card Details Modal -->
+        <div id="cardDetailsModal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-icon" id="cardDetailsIcon">🧬</div>
+                    <h2 class="modal-title" id="cardDetailsTitle">Carta de Recurso</h2>
+                </div>
+                <div class="card-details-body">
+                    <div class="card-detail-section">
+                        <h3>📋 Descrição:</h3>
+                        <p id="cardDetailsDescription"></p>
+                    </div>
+                    <div class="card-detail-section">
+                        <h3>🔬 Uso no Jogo:</h3>
+                        <p id="cardDetailsUsage"></p>
+                    </div>
+                    <div class="card-detail-section" id="cardDetailsTriviaSection">
+                        <h3>💡 Curiosidade Científica:</h3>
+                        <p id="cardDetailsTrivia"></p>
+                    </div>
+                </div>
+                <button id="cardDetailsCloseBtn" class="modal-btn">Fechar</button>
+            </div>
+        </div>
+
+        <!-- Game Scripts -->
+        <script src="/static/game-data.js"></script>
+        <script src="/static/game.js"></script>
+        <script src="/static/app.js"></script>
+    </body>
+    </html>
+  `)
+})
+
+// API endpoint for game state (optional, for future enhancements)
+app.get('/api/game/state', (c) => {
+  return c.json({
+    status: 'running',
+    message: 'Game state is managed client-side'
+  })
+})
+
+export default app

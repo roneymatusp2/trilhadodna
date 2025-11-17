@@ -21,9 +21,9 @@
 
 ## 🌐 URLs do Projeto
 
-- **Desenvolvimento Local**: https://3000-i8k6tnqgmxfxmb002my6s-18e660f9.sandbox.novita.ai
-- **GitHub**: (A ser configurado)
-- **Produção**: (A ser configurado após deploy)
+- **GitHub**: https://github.com/roneymatusp2/trilhadodna
+- **Netlify**: (Configure após o deploy)
+- **Desenvolvimento Local**: http://localhost:5173
 
 ---
 
@@ -248,9 +248,32 @@ webapp/
 - Animações e feedback
 - Testes locais
 
+### ✨ Melhorias Visuais Recentes
+
+#### 🎲 Dados 3D
+- Dados aumentados em 25% (150px)
+- Números gigantes e super visíveis (5.5em)
+- Efeito 3D realista com profundidade de 75px
+- Total destacado com animação aprimorada
+- Múltiplas sombras para maior profundidade
+
+#### 🗺️ Tabuleiro
+- Casas maiores (140px) com melhor espaçamento
+- Cores específicas para cada tipo de casa:
+  - 🔵 Conceito (Azul)
+  - 🔴 Desafio (Vermelho)
+  - 🟢 Recurso (Verde)
+  - 🟡 Especial (Laranja)
+  - 🟣 Missão (Roxo)
+  - 🔷 Hub (Índigo)
+- Ícones 12% maiores (2.8em)
+- Layout otimizado e responsivo
+
+Veja mais detalhes em [MELHORIAS_TABULEIRO_DADOS.md](./MELHORIAS_TABULEIRO_DADOS.md)
+
 ### 🚀 Próximos Passos
-- [ ] Deploy no Cloudflare Pages
-- [ ] Configuração de GitHub
+- [x] Deploy no GitHub ✅
+- [ ] Deploy no Netlify
 - [ ] Multiplayer online (futuro)
 - [ ] Modo de tutorial (futuro)
 - [ ] Estatísticas persistentes (futuro)
@@ -299,8 +322,25 @@ Desenvolvido com ❤️ para educação em biotecnologia.
 
 ---
 
-## 🎮 Jogar Agora
+## 🎮 Como Jogar
 
-Acesse: **https://3000-i8k6tnqgmxfxmb002my6s-18e660f9.sandbox.novita.ai**
+### Deploy no Netlify
+
+1. Faça login no [Netlify](https://app.netlify.com)
+2. Clique em "Add new site" > "Import an existing project"
+3. Conecte ao GitHub e selecione o repositório `trilhadodna`
+4. Configure:
+   - **Build command**: `npm run build`
+   - **Publish directory**: `dist`
+5. Clique em "Deploy site"
+
+### Desenvolvimento Local
+
+```bash
+npm install
+npm run dev
+```
+
+Acesse: http://localhost:5173
 
 Boa sorte, cientista! Que vença o melhor pesquisador! 🧬🏆
